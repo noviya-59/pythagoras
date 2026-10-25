@@ -243,9 +243,29 @@
         @keyframes dash {
             to { stroke-dashoffset: -16; }
         }
+        
+        /* Language Toggle Styles */
+        body.is-en .lang-id { display: none !important; }
+        body.is-id .lang-en { display: none !important; }
     </style>
 </head>
-<body class="h-full bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white overflow-auto">
+<body class="is-id h-full bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white overflow-auto">
+    <!-- Top Right Controls (Language & Fullscreen) -->
+    <div class="fixed top-4 right-4 md:top-6 md:right-8 z-50 flex items-center gap-2">
+        <!-- Fullscreen Button -->
+        <button onclick="toggleFullScreen()" id="fullscreen-btn" title="Full Screen" class="bg-slate-800/80 backdrop-blur border-2 border-purple-500 text-white p-2 md:px-3 md:py-2 rounded-full text-xs md:text-sm font-bold shadow-[0_0_15px_rgba(167,139,250,0.4)] transform transition hover:scale-105 flex items-center justify-center">
+            <span id="fs-icon-enter"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 md:w-5 md:h-5 fill-current" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg></span>
+            <span id="fs-icon-exit" class="hidden"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 md:w-5 md:h-5 fill-current" viewBox="0 0 24 24"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg></span>
+        </button>
+        
+        <!-- Language Switcher Button -->
+        <button onclick="toggleLanguage()" id="lang-toggle-btn" class="bg-slate-800/80 backdrop-blur border-2 border-purple-500 text-white px-3 py-2 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-bold shadow-[0_0_15px_rgba(167,139,250,0.4)] transform transition hover:scale-105 flex items-center gap-2">
+            <span class="lang-id flex items-center gap-2"><img src="https://imgur.com/xlEmIdb.png" alt="ID" class="w-5 md:w-6 h-auto drop-shadow-md"> <span>ID</span></span>
+            <span class="lang-en flex items-center gap-2"><img src="https://imgur.com/zRXI8Eh.png" alt="EN" class="w-5 md:w-6 h-auto drop-shadow-md"> <span>EN</span></span>
+            <span class="text-purple-400 text-sm ml-1">🔄</span>
+        </button>
+    </div>
+
     <!-- Splash Screen -->
     <div class="splash-screen">
         <div class="splash-content">
@@ -282,21 +302,21 @@
             </header>
 
             <!-- Navigation -->
-            <nav class="flex flex-wrap justify-center gap-2 mb-6">
+            <nav class="flex flex-wrap justify-center gap-2 mb-6 mt-4">
                 <button onclick="showSection('tujuan')" id="nav-tujuan" class="nav-btn px-4 py-2 md:px-6 md:py-3 rounded-lg font-semibold transition-all text-sm md:text-base bg-purple-600 text-white shadow-lg">
-                    🏠 <span class="hidden sm:inline">Beranda</span>
+                    🏠 <span class="hidden sm:inline"><span class="lang-id">Beranda</span><span class="lang-en">Home</span></span>
                 </button>
                 <button onclick="showSection('materi')" id="nav-materi" class="nav-btn px-4 py-2 md:px-6 md:py-3 rounded-lg font-semibold transition-all text-sm md:text-base bg-slate-700 text-purple-300 hover:bg-slate-600">
-                    📚 <span class="hidden sm:inline">Materi</span>
+                    📚 <span class="hidden sm:inline"><span class="lang-id">Materi</span><span class="lang-en">Learn</span></span>
                 </button>
                 <button onclick="showSection('simulasi')" id="nav-simulasi" class="nav-btn px-4 py-2 md:px-6 md:py-3 rounded-lg font-semibold transition-all text-sm md:text-base bg-slate-700 text-purple-300 hover:bg-slate-600">
-                    🔬 <span class="hidden sm:inline">Simulasi</span>
+                    🔬 <span class="hidden sm:inline"><span class="lang-id">Simulasi</span><span class="lang-en">Simulation</span></span>
                 </button>
                 <button onclick="showSection('misi')" id="nav-misi" class="nav-btn px-4 py-2 md:px-6 md:py-3 rounded-lg font-semibold transition-all text-sm md:text-base bg-slate-700 text-purple-300 hover:bg-slate-600">
-                    ⚔️ <span class="hidden sm:inline">Misi</span>
+                    ⚔️ <span class="hidden sm:inline"><span class="lang-id">Misi</span><span class="lang-en">Quests</span></span>
                 </button>
                 <button onclick="showSection('pengembang')" id="nav-pengembang" class="nav-btn px-4 py-2 md:px-6 md:py-3 rounded-lg font-semibold transition-all text-sm md:text-base bg-slate-700 text-purple-300 hover:bg-slate-600">
-                    👨‍💻 <span class="hidden sm:inline">Pengembang</span>
+                    👨‍💻 <span class="hidden sm:inline"><span class="lang-id">Pengembang</span><span class="lang-en">Developer</span></span>
                 </button>
             </nav>
 
@@ -707,11 +727,13 @@
 
     <script>
         const STORAGE_KEY = 'petualangan_pythagoras_progress_v1';
+        let currentLang = 'id'; // State untuk melacak bahasa aktif
+
         const quests = [
-            { id: 'quest1', title: 'Misi 1: Gerbang Dasar', icon: '📖', question: 'Sisi alas a = 6 cm dan tinggi b = 8 cm. Berapa panjang sisi miring c?', answer: 10, hint: 'c = √(6² + 8²)' },
-            { id: 'quest2', title: 'Misi 2: Mencari Tinggi', icon: '📐', question: 'Sisi miring c = 13 m dan alas a = 5 m. Berapa sisi b (tinggi)?', answer: 12, hint: 'b = √(13² - 5²)' },
-            { id: 'quest3', title: 'Misi 3: Navigasi Kapal', icon: '🚢', question: 'Kapal berlayar ke timur 15 km, lalu ke utara 8 km. Berapa jarak lurus dari titik awal?', answer: 17, hint: 'c = √(15² + 8²)' },
-            { id: 'quest4', title: 'Misi 4: Boss Akhir (Tangga)', icon: '🏆', question: 'Tangga 10m disandarkan ke dinding. Jarak kaki tangga ke dinding 6m. Berapa tinggi dinding yang dicapai?', answer: 8, hint: 'b = √(10² - 6²)' }
+            { id: 'quest1', title: {id: 'Misi 1: Gerbang Dasar', en: 'Quest 1: Basic Gate'}, icon: '📖', question: {id: 'Sisi alas a = 6 cm dan tinggi b = 8 cm. Berapa panjang sisi miring c?', en: 'Base a = 6 cm and height b = 8 cm. What is the length of hypotenuse c?'}, answer: 10, hint: 'c = √(6² + 8²)' },
+            { id: 'quest2', title: {id: 'Misi 2: Mencari Tinggi', en: 'Quest 2: Finding Height'}, icon: '📐', question: {id: 'Sisi miring c = 13 m dan alas a = 5 m. Berapa sisi b (tinggi)?', en: 'Hypotenuse c = 13 m and base a = 5 m. What is side b (height)?'}, answer: 12, hint: 'b = √(13² - 5²)' },
+            { id: 'quest3', title: {id: 'Misi 3: Navigasi Kapal', en: 'Quest 3: Ship Navigation'}, icon: '🚢', question: {id: 'Kapal berlayar ke timur 15 km, lalu ke utara 8 km. Berapa jarak lurus dari titik awal?', en: 'A ship sails east 15 km, then north 8 km. What is the straight distance from start?'}, answer: 17, hint: 'c = √(15² + 8²)' },
+            { id: 'quest4', title: {id: 'Misi 4: Boss Akhir (Tangga)', en: 'Quest 4: Final Boss (Ladder)'}, icon: '🏆', question: {id: 'Tangga 10m disandarkan ke dinding. Jarak kaki tangga ke dinding 6m. Berapa tinggi dinding yang dicapai?', en: 'A 10m ladder leans against a wall. The base is 6m away. How high does it reach?'}, answer: 8, hint: 'b = √(10² - 6²)' }
         ];
 
         let completedQuests = new Map();
@@ -758,13 +780,68 @@
         function applyConfig() {
             const titleEl = document.getElementById('app-title');
             const heroEl = document.getElementById('hero-display');
-            if (titleEl) titleEl.textContent = '⚔️ ' + (config.app_title || 'Petualangan Pythagoras');
+            if (titleEl) titleEl.innerHTML = '⚔️ ' + (config.app_title || '<span class="lang-id">Petualangan Pythagoras</span><span class="lang-en">Pythagoras Adventure</span>');
             if (heroEl) heroEl.textContent = config.hero_name || 'Pahlawan';
         }
 
-        function showToast(msg, type='success') {
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch((err) => {
+                    console.log(`Error attempting to enable fullscreen: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        // Listener untuk memperbarui ikon fullscreen saat status layar penuh berubah
+        document.addEventListener('fullscreenchange', () => {
+            const iconEnter = document.getElementById('fs-icon-enter');
+            const iconExit = document.getElementById('fs-icon-exit');
+            if (document.fullscreenElement) {
+                iconEnter.classList.add('hidden');
+                iconExit.classList.remove('hidden');
+            } else {
+                iconEnter.classList.remove('hidden');
+                iconExit.classList.add('hidden');
+            }
+        });
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'id' ? 'en' : 'id';
+            
+            // Ubah Class pada tag <body> untuk memicu perubahan elemen statis di HTML
+            if (currentLang === 'en') {
+                document.body.classList.remove('is-id');
+                document.body.classList.add('is-en');
+                
+                // Ubah Placeholder Lab Sihir
+                document.getElementById('calc-a').placeholder = 'Base...';
+                document.getElementById('calc-b').placeholder = 'Height...';
+                document.getElementById('calc-c').placeholder = 'Hypotenuse...';
+            } else {
+                document.body.classList.remove('is-en');
+                document.body.classList.add('is-id');
+                
+                // Kembalikan Placeholder Lab Sihir
+                document.getElementById('calc-a').placeholder = 'Alas...';
+                document.getElementById('calc-b').placeholder = 'Tinggi...';
+                document.getElementById('calc-c').placeholder = 'Miring...';
+            }
+
+            // Render ulang elemen yang dinamis lewat Javascript
+            updateProgress();
+            renderQuestList();
+            if (currentQuestId) openQuest(currentQuestId); // Segarkan teks jika misi sedang terbuka
+            hitungPythagoras(); // Segarkan teks kuali jika ada hasil
+        }
+
+        function showToast(msgId, msgEn, type='success') {
             const container = document.getElementById('toast-container');
             if (!container) return;
+            const msg = currentLang === 'id' ? msgId : (msgEn || msgId);
             const toast = document.createElement('div');
             toast.className = `toast px-4 py-3 rounded-lg mb-2 ${type === 'success' ? 'bg-green-600' : 'bg-red-600'} text-white font-semibold shadow-lg`;
             toast.textContent = msg;
@@ -811,7 +888,7 @@
             const progFill = document.getElementById('progress-fill');
             const allComplete = document.getElementById('all-complete');
 
-            if (progText) progText.textContent = `${comp}/${total} Misi`;
+            if (progText) progText.textContent = `${comp}/${total} ${currentLang === 'id' ? 'Misi' : 'Quests'}`;
             if (progFill) progFill.style.width = (comp / total) * 100 + '%';
             if (allComplete) {
                 if (comp === total) allComplete.classList.remove('hidden');
@@ -870,8 +947,8 @@
 
                         <!-- Tooltip Label yang muncul saat di-hover -->
                         <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-max max-w-[150px] opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900/95 backdrop-blur-sm border ${borderColor} p-2 rounded-lg text-center z-30 pointer-events-none shadow-xl">
-                            <p class="text-xs font-bold ${isComp ? 'text-green-400' : isLocked ? 'text-slate-400' : 'text-yellow-300'}">${q.title}</p>
-                            <p class="text-[10px] text-slate-300 mt-1">${isComp ? 'Selesai ⭐' : isLocked ? 'Terkunci 🔒' : 'Misi Aktif, Serang! ⚔️'}</p>
+                            <p class="text-xs font-bold ${isComp ? 'text-green-400' : isLocked ? 'text-slate-400' : 'text-yellow-300'}">${q.title[currentLang]}</p>
+                            <p class="text-[10px] text-slate-300 mt-1">${isComp ? (currentLang === 'id' ? 'Selesai ⭐' : 'Completed ⭐') : isLocked ? (currentLang === 'id' ? 'Terkunci 🔒' : 'Locked 🔒') : (currentLang === 'id' ? 'Misi Aktif, Serang! ⚔️' : 'Active, Attack! ⚔️')}</p>
                         </div>
                     </div>
                 `;
@@ -891,9 +968,13 @@
             const panelEl = document.getElementById('quest-panel');
             const submitBtn = document.getElementById('submit-btn');
 
-            if (titleEl) titleEl.textContent = q.title;
-            if (qEl) qEl.innerHTML = `${q.question}<br><span class="text-xs text-yellow-300 mt-2 block">💡 Petunjuk: ${q.hint}</span>`;
-            if (ansEl) ansEl.value = '';
+            if (titleEl) titleEl.textContent = q.title[currentLang];
+            if (qEl) qEl.innerHTML = `${q.question[currentLang]}<br><span class="text-xs text-yellow-300 mt-2 block">💡 ${currentLang === 'id' ? 'Petunjuk' : 'Hint'}: ${q.hint}</span>`;
+            if (ansEl) {
+                ansEl.value = '';
+                ansEl.placeholder = currentLang === 'id' ? 'Ketik angka...' : 'Type number...';
+            }
+            if (submitBtn) submitBtn.innerHTML = currentLang === 'id' ? '⚔️ Serang!' : '⚔️ Attack!';
             if (fbEl) fbEl.classList.add('hidden');
             if (panelEl) panelEl.classList.remove('hidden');
             if (submitBtn) submitBtn.disabled = false;
@@ -916,7 +997,7 @@
 
             if (isNaN(val)) {
                 if (fb) {
-                    fb.innerHTML = '<div class="bg-red-900/50 border border-red-500 text-red-300 px-4 py-3 rounded-lg">Masukkan angka yang valid!</div>';
+                    fb.innerHTML = `<div class="bg-red-900/50 border border-red-500 text-red-300 px-4 py-3 rounded-lg">${currentLang === 'id' ? 'Masukkan angka yang valid!' : 'Enter a valid number!'}</div>`;
                     fb.classList.remove('hidden');
                 }
                 return;
@@ -927,7 +1008,7 @@
                 const submitBtn = document.getElementById('submit-btn');
                 if (submitBtn) submitBtn.disabled = true;
                 if (fb) {
-                    fb.innerHTML = '<div class="bg-green-900/50 border border-red-500 text-green-300 px-4 py-3 rounded-lg font-bold">⭐ Benar! Misi Selesai!</div>';
+                    fb.innerHTML = `<div class="bg-green-900/50 border border-green-500 text-green-300 px-4 py-3 rounded-lg font-bold">⭐ ${currentLang === 'id' ? 'Benar! Misi Selesai!' : 'Correct! Quest Cleared!'}</div>`;
                     fb.classList.remove('hidden');
                 }
 
@@ -937,13 +1018,13 @@
                     saveLocalProgress();
                     updateProgress(); renderQuestList();
                     if (window.dataSdk) await window.dataSdk.create(rec);
-                    showToast('Progres tersimpan! ⭐');
+                    showToast('Progres tersimpan! ⭐', 'Progress saved! ⭐');
                 }
                 isSubmitting = false;
                 setTimeout(() => closeQuest(), 1400);
             } else {
                 if (fb) {
-                    fb.innerHTML = '<div class="bg-red-900/50 border border-red-500 text-red-300 px-4 py-3 rounded-lg font-bold">❌ Belum tepat, coba lagi!</div>';
+                    fb.innerHTML = `<div class="bg-red-900/50 border border-red-500 text-red-300 px-4 py-3 rounded-lg font-bold">${currentLang === 'id' ? '❌ Belum tepat, coba lagi!' : '❌ Incorrect, try again!'}</div>`;
                     fb.classList.remove('hidden');
                 }
             }
@@ -960,7 +1041,7 @@
             completedQuests.clear();
             saveLocalProgress();
             closeQuest(); updateProgress(); renderQuestList();
-            showToast('Progres direset!');
+            showToast('Progres direset!', 'Progress reset!');
             isSubmitting = false;
         }
 
@@ -1048,9 +1129,12 @@
                 cInput.value = cCalc % 1 === 0 ? cCalc : cCalc.toFixed(2);
                 let svgVisual = getTriangleSVG(a, b, cInput.value, 'c');
 
+                const tAction = currentLang === 'id' ? 'Mengekstrak' : 'Extracting';
+                const tTarget = currentLang === 'id' ? 'Kristal Miring' : 'Hypotenuse Crystal';
+
                 resultHTML = `
                     <div class="w-full text-center">
-                        <p class="text-sm text-purple-300 mb-1">🔮 Mengekstrak <span class="text-yellow-400 font-bold">Kristal Miring (c)</span>...</p>
+                        <p class="text-sm text-purple-300 mb-1">🔮 ${tAction} <span class="text-yellow-400 font-bold">${tTarget} (c)</span>...</p>
                         ${svgVisual}
                         <p class="font-mono bg-slate-800/50 py-1 px-3 rounded-lg inline-block text-sm mb-1">c = √(${a}² + ${b}²)</p><br>
                         <p class="font-mono bg-slate-800/50 py-1 px-3 rounded-lg inline-block text-sm">c = √(${a*a + b*b})</p>
@@ -1061,7 +1145,8 @@
                 `;
             } else if (isA && !isB && isC) {
                 if (c <= a) {
-                     resultDiv.innerHTML = '<div class="text-center opacity-90 mt-4"><span class="text-5xl block mb-4">💥</span><p class="text-red-400 font-bold">Mantra Gagal!<br>Kristal miring (c) harus lebih panjang dari ekstrak alas (a)!</p></div>';
+                     const err = currentLang === 'id' ? 'Mantra Gagal!<br>Kristal miring (c) harus lebih panjang dari ekstrak alas (a)!' : 'Spell Failed!<br>Hypotenuse (c) must be longer than the base (a)!';
+                     resultDiv.innerHTML = `<div class="text-center opacity-90 mt-4"><span class="text-5xl block mb-4">💥</span><p class="text-red-400 font-bold">${err}</p></div>`;
                      return;
                 }
                 createSparkles();
@@ -1071,9 +1156,12 @@
                 bInput.value = bCalc % 1 === 0 ? bCalc : bCalc.toFixed(2);
                 let svgVisual = getTriangleSVG(a, bInput.value, c, 'b');
 
+                const tAction = currentLang === 'id' ? 'Mensintesis' : 'Synthesizing';
+                const tTarget = currentLang === 'id' ? 'Esensi Tinggi' : 'Height Essence';
+
                 resultHTML = `
                     <div class="w-full text-center">
-                        <p class="text-sm text-purple-300 mb-1">🔮 Mensintesis <span class="text-blue-400 font-bold">Esensi Tinggi (b)</span>...</p>
+                        <p class="text-sm text-purple-300 mb-1">🔮 ${tAction} <span class="text-blue-400 font-bold">${tTarget} (b)</span>...</p>
                         ${svgVisual}
                         <p class="font-mono bg-slate-800/50 py-1 px-3 rounded-lg inline-block text-sm mb-1">b = √(${c}² - ${a}²)</p><br>
                         <p class="font-mono bg-slate-800/50 py-1 px-3 rounded-lg inline-block text-sm">b = √(${c*c - a*a})</p>
@@ -1084,7 +1172,8 @@
                 `;
             } else if (!isA && isB && isC) {
                 if (c <= b) {
-                     resultDiv.innerHTML = '<div class="text-center opacity-90 mt-4"><span class="text-5xl block mb-4">💥</span><p class="text-red-400 font-bold">Mantra Gagal!<br>Kristal miring (c) harus lebih panjang dari esensi tinggi (b)!</p></div>';
+                     const err = currentLang === 'id' ? 'Mantra Gagal!<br>Kristal miring (c) harus lebih panjang dari esensi tinggi (b)!' : 'Spell Failed!<br>Hypotenuse (c) must be longer than the height (b)!';
+                     resultDiv.innerHTML = `<div class="text-center opacity-90 mt-4"><span class="text-5xl block mb-4">💥</span><p class="text-red-400 font-bold">${err}</p></div>`;
                      return;
                 }
                 createSparkles();
@@ -1094,9 +1183,12 @@
                 aInput.value = aCalc % 1 === 0 ? aCalc : aCalc.toFixed(2);
                 let svgVisual = getTriangleSVG(aInput.value, b, c, 'a');
 
+                const tAction = currentLang === 'id' ? 'Meracik' : 'Brewing';
+                const tTarget = currentLang === 'id' ? 'Ekstrak Alas' : 'Base Extract';
+
                 resultHTML = `
                     <div class="w-full text-center">
-                        <p class="text-sm text-purple-300 mb-1">🔮 Meracik <span class="text-green-400 font-bold">Ekstrak Alas (a)</span>...</p>
+                        <p class="text-sm text-purple-300 mb-1">🔮 ${tAction} <span class="text-green-400 font-bold">${tTarget} (a)</span>...</p>
                         ${svgVisual}
                         <p class="font-mono bg-slate-800/50 py-1 px-3 rounded-lg inline-block text-sm mb-1">a = √(${c}² - ${b}²)</p><br>
                         <p class="font-mono bg-slate-800/50 py-1 px-3 rounded-lg inline-block text-sm">a = √(${c*c - b*b})</p>
@@ -1106,10 +1198,14 @@
                     </div>
                 `;
             } else if (isA && isB && isC) {
-                 resultDiv.innerHTML = '<div class="text-center opacity-90 mt-6"><span class="text-5xl block mb-4">⚠️</span><p class="text-yellow-400 font-bold">Kuali Penuh!</p><p class="text-sm text-purple-200 mt-2">Kosongkan salah satu kotak (a, b, atau c) untuk meraciknya kembali.</p></div>';
+                 const errTitle = currentLang === 'id' ? 'Kuali Penuh!' : 'Cauldron Full!';
+                 const errDesc = currentLang === 'id' ? 'Kosongkan salah satu kotak (a, b, atau c) untuk meraciknya kembali.' : 'Empty one of the boxes (a, b, or c) to brew again.';
+                 resultDiv.innerHTML = `<div class="text-center opacity-90 mt-6"><span class="text-5xl block mb-4">⚠️</span><p class="text-yellow-400 font-bold">${errTitle}</p><p class="text-sm text-purple-200 mt-2">${errDesc}</p></div>`;
                  return;
             } else {
-                 resultDiv.innerHTML = '<div class="text-center opacity-90 mt-6"><span class="text-5xl block mb-4">🤔</span><p class="text-purple-300 font-bold">Kekurangan Bahan!</p><p class="text-sm text-purple-200 mt-2">Kuali membutuhkan tepat <strong>DUA</strong> angka bahan untuk bisa meracik sisi yang hilang.</p></div>';
+                 const errTitle = currentLang === 'id' ? 'Kekurangan Bahan!' : 'Not Enough Ingredients!';
+                 const errDesc = currentLang === 'id' ? 'Kuali membutuhkan tepat <strong>DUA</strong> angka bahan untuk bisa meracik sisi yang hilang.' : 'The cauldron requires exactly <strong>TWO</strong> numbers to brew the missing side.';
+                 resultDiv.innerHTML = `<div class="text-center opacity-90 mt-6"><span class="text-5xl block mb-4">🤔</span><p class="text-purple-300 font-bold">${errTitle}</p><p class="text-sm text-purple-200 mt-2">${errDesc}</p></div>`;
                  return;
             }
 
@@ -1124,10 +1220,11 @@
             const cauldronGlow = document.getElementById('cauldron-glow');
             if(cauldronGlow) cauldronGlow.style.background = 'radial-gradient(ellipse, rgba(16, 185, 129, 0.8) 0%, rgba(16, 185, 129, 0) 70%)';
             
+            const tDesc = currentLang === 'id' ? 'Kuali telah dibersihkan.<br>Siap untuk ramuan berikutnya!' : 'Cauldron cleared.<br>Ready for the next potion!';
             document.getElementById('calc-result').innerHTML = `
                 <div class="text-center opacity-70">
                     <span class="text-5xl block mb-4 text-emerald-400 drop-shadow-[0_0_10px_rgba(16,185,129,0.8)]">✨</span>
-                    <p class="text-slate-300 italic text-base">Kuali telah dibersihkan.<br>Siap untuk ramuan berikutnya!</p>
+                    <p class="text-slate-300 italic text-base">${tDesc}</p>
                 </div>
             `;
         }
